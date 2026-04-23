@@ -8,19 +8,20 @@ import cookieParser from "cookie-parser"
 import authRoutes from "./routes/authRoutes.js"
 import productRoutes from "./routes/productRoute.js"
 import cartRoutes from "./routes/cartRoutes.js"
+import orderRoutes from "./routes/orderRouts.js"
 
 dotenv.config();
 connectDb() ;
 const app = express()
-
 app.use(cookieParser())
 app.use(express.json())
 
 
 
 app.use("/api/auth", authRoutes)
-app.use("/api/product" , productRoutes )
+app.use("/api/products" , productRoutes )
 app.use("/api/cart", cartRoutes )
+app.use("/api/order" , orderRoutes )
 
 
 const PORT = process.env.PORT

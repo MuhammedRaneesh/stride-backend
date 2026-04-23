@@ -76,8 +76,13 @@ export const removeCart = async (req, res) => {
         const userId = req.user._id;
         const { productId, size } = req.body;
 
-        await Cart.findOneAndDelete({ userId, productId, size })
-
+        const deleteItem = await Cart.findOneAndDelete({ userId, productId, size })
+        if(!deleteItem){
+            return res.status(404).json({
+                success : false ,
+                message : "cart item not found"
+            })
+        }
         res.status(200).json({
             success: true,
             message: "item removed from cart success"
