@@ -36,10 +36,14 @@ const productSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
-},  
-    {timestamps : true}
+    isDeleted: {
+        type: Boolean,
+        default: false
+    }
+},
+    { timestamps: true }
 )
 
-const Product = mongoose.model("Product" , productSchema)
+const Product = mongoose.model("Product", productSchema)
 
 export default Product

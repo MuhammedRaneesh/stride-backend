@@ -9,12 +9,23 @@ export const getAllProducts = async (req, res) => {
             filter.brand = req.query.brand;
         }
 
-        const products = await Product.find(filter)
+        const page = parseInt(req.query.page) || 1
+        const limit = parseInt(req.query.limit) || 12
+        const skip = (page - 1) * limit
+
+        const totalProducts = await Product.countDocuments(filter)
+        const products = await Product.find(filter).skip(skip).limit(limit)
 
         res.status(200).json({
             success: true,
             count: products.length,
-            products,
+            pagination: {
+                totalProducts,
+                totalPages: Math.ceil(totalProducts / limit),
+                currentPage: page,
+                limit
+            },
+            products
         })
     } catch (error) {
         res.status(500).json({
@@ -39,7 +50,7 @@ export const getProductById = async (req, res) => {
             success: true,
             product
         })
-        
+
     } catch (error) {
 
         if (error.name === "CastError") {
@@ -53,5 +64,51 @@ export const getProductById = async (req, res) => {
             success: false,
             message: "Server error",
         });
+    }
+}
+
+export const searchProducts = async (req, res) => {
+    try {
+        const { keyword, page, limit } = req.query;
+
+        if (!keyword) {
+            return res.status(200).json(
+                {
+                    success: true,
+                    product: [],
+                    message: "no matches found"
+                })
+        }
+
+        const Page = parseInt(page) || 1;
+        const Limit = parseInt(limit) || 12;
+        const Skip = (Page - 1) * Limit;
+
+        const filter = {
+            $or: [
+                { name: { $regex: keyword, $options: "i" } },
+                { brand: { $regex: keyword, $options: "i" } },
+                { category: { $regex: keyword, $options: "i" } }
+            ]
+        };
+
+        const totalProducts = await Product.countDocuments(filter)
+        const products = await Product.find(filter).skip(Skip).limit(Limit)
+
+        res.status(200).json({
+            success: true,
+            count: products.length,
+            pagination: {
+                totalProducts,
+                totalPages: Math.ceil(totalProducts / Limit),
+                currentPage: Page
+            },
+            products
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "server error"
+        })
     }
 }

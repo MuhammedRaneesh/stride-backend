@@ -25,3 +25,11 @@ export const protect = async (req,res,next) => {
         return res.status(401).json({ message: 'Invalid token' });
     }
 }
+
+export const  adminOnly = async (req,res,next) => {
+    if(req.user &&  req.user.role === "admin"){
+        next()
+    }else{
+        return res.status(401).json({ success : false , message :  "only admin can accesses "})
+    }
+}
