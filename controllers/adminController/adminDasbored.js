@@ -5,7 +5,6 @@ import User from "../../models/User.js";
 
 export const getAdminDashboard = async (req, res) => {
     try {
-
         const revenueResult = await Order.aggregate([
             {
                 $group: {
@@ -15,7 +14,7 @@ export const getAdminDashboard = async (req, res) => {
             },
         ]);
 
-
+        const totalRevenue = revenueResult[0]?.totalRevenue || 0;
         const activeUsers = await User.countDocuments({
             role: "user",
             isDeleted: false,
@@ -27,6 +26,10 @@ export const getAdminDashboard = async (req, res) => {
         });
 
         const orders = await Order.countDocuments();
+        const recentOrders = await Order.find()
+            .populate("userId", "username email")
+            .sort({ createdAt: -1 })
+            .limit(5);
 
         res.status(200).json({
             success: true,
@@ -35,6 +38,7 @@ export const getAdminDashboard = async (req, res) => {
                 activeUsers,
                 totalProducts,
                 orders,
+                recentOrders,
             },
         });
     } catch (error) {

@@ -4,6 +4,7 @@ import { pagination } from "../utils/pagination.js";
 export const getAllProducts = async (req, res) => {
     try {
         const { page, limit, skip } = pagination(req.query)
+        
         const { keyword, brand, category } = req.query
 
         const filter = { isDeleted: { $ne: true } }
